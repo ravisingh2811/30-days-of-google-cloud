@@ -49,6 +49,8 @@ Task - 4 : Create and configure Cloud SQL Instance
 
 gcloud sql instances create griffin-dev-db --root-password password --region=us-east1
 
+///////////////It will take some time So don't worry ???????????????????????????///////////
+
 gcloud sql connect griffin-dev-db
 
 !!!In Password Section password is invisible to you so you just type the password!!!!!!!!
