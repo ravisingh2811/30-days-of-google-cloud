@@ -1,10 +1,8 @@
-   
 Deploy to Kubernetes in Google Cloud: Challenge Lab
 
----------------------------------------------------------------------------------------------------------------------
-TASK 1 Create a Docker image and store the Dockerfile
 
-gcloud auth list
+step 1:----------- Create a Docker image and store the Dockerfile -----------------
+
 gsutil cat gs://cloud-training/gsp318/marking/setup_marking.sh | bash
 gcloud source repos clone valkyrie-app
 cd valkyrie-app
@@ -20,27 +18,36 @@ cd ..
 cd marking
 ./step1.sh
 
----------------------------------------------------------------------------------------------------------------------
-TASK 2 Test the created Docker image
 
+
+
+******************************************************************************************************************************
+step 2:----------- Test the created Docker image -----------------
 cd ..
 cd valkyrie-app
 docker run -p 8080:8080 valkyrie-app:v0.0.1 &
 cd ..
 cd marking
-./step2.sh
+./step2.sh  
 
----------------------------------------------------------------------------------------------------------------------
-TASK 3 Push the Docker image in the Google Container Repository
 
+
+
+
+******************************************************************************************************************************
+step 3:----------- Push the Docker image in the Container Repository -----------------
 cd ..
 cd valkyrie-app
 docker tag valkyrie-app:v0.0.1 gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.1
 docker push gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.1
 sed -i s#IMAGE_HERE#gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.1#g k8s/deployment.yaml
 
----------------------------------------------------------------------------------------------------------------------
-TASK 4 Create and expose a deployment in Kubernetes
+
+
+
+
+******************************************************************************************************************************
+step 4:------------ Create and expose a deployment in Kubernetes -----------------
 
 sed -i s#IMAGE_HERE#gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.1#g k8s/deployment.yaml
 gcloud container clusters get-credentials valkyrie-dev --zone us-east1-d
@@ -48,27 +55,25 @@ kubectl create -f k8s/deployment.yaml
 kubectl create -f k8s/service.yaml
 
 git merge origin/kurt-dev
-
----------------------------------------------------------------------------------------------------------------------
-TASK 5 Increase the replicas from 1 to 3
-
 kubectl edit deployment valkyrie-dev
-Press "i" to get into insert mode and change "replicas" from 1 to 3. Press "Esc" -> ":wq" -> Enter to exit Vim.
 
 
----------------------------------------------------------------------------------------------------------------------
-TASK 6 Update the deployment with a new version of valkyrie-app
 
-docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.2 .
+
+******************************************************************************************************************************
+step 5:------------ Update the deployment with a new version of valkyrie-app -----------------
+
+docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.2 . 
 docker push gcr.io/$GOOGLE_CLOUD_PROJECT/valkyrie-app:v0.0.2
 kubectl edit deployment valkyrie-dev
 
-Press 'i' to edit and change image to "image: gcr.io/YOUR_PROJECT_ID/valkyrie-app:v0.0.2". Press "Esc" -> ":wq" -> Enter
-
 docker ps
 
----------------------------------------------------------------------------------------------------------------------
-TASK 7 Create a pipeline in Jenkins to deploy your app
+
+
+
+
+step 6:-------------------- Create a pipeline in Jenkins to deploy your app -----------------
 
 docker kill container_id
 
@@ -78,32 +83,16 @@ printf $(kubectl get secret cd-jenkins -o jsonpath="{.data.jenkins-admin-passwor
 
 gcloud source repos list
 
-Open Jenkins Web View -> Preview on port 8080
-
-   Username : admin
-   Password : {Code output from previous command}
-
-Go through the following:
-
--> Manage Jenkins -> Manage Credentials -> Global -> add credentials -> Kind: Google Service Account from metadata -> OK
-
--> Jenkins -> New Item -> Name : valkyrie-app -> Pipeline -> OK
-
--> Pipeline -> Script: Pipeline script from SCM -> SCM: Git
-
--> Repository URL: {Url from previous command} -> Credentials: {Project id}
-
--> Apply -> Save
-
-In cloud shell , run
-
 sed -i "s/green/orange/g" source/html.go
 
+
+# Update project in Jenkinsfile
+
 sed -i "s/YOUR_PROJECT/$GOOGLE_CLOUD_PROJECT/g" Jenkinsfile
-git config --global user.email "you@example.com"              // Email
-git config --global user.name "student..."                       // Username
+git config --global user.email "you@example.com"     <------ put from first consol 
+git config --global user.name "student"               <--------- from login status
 git add .
 git commit -m "built pipeline init"
-git push
+git push 
 
-In Jenkins click Build and wait to get score.
+in last on jenkins windows tamplate just click on built which is in nevigation manu 
