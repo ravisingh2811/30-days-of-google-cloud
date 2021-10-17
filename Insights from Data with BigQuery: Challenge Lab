@@ -243,6 +243,12 @@ WHERE
   AND country_name ="United States of America"
 GROUP BY date
 
+if your data studio is not opening then follow this step below
+
+Click on the data studio (*make sure ki lab ka temp acct login hua hai* )
+then create a blank report and then google connectors mai big query select karo and then niche waha par option mai 
+custom query select karna and apni project ID select karke 10th task ka query likhkar waha par daaldena then add to report kardena.
+
 After that Explore data with DataStudio And select Any Chart 
 
 All Done Thank You ☺☺
