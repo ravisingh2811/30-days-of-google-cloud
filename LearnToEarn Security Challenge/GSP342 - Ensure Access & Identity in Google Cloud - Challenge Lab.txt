@@ -1,5 +1,3 @@
-Author: Sakura Satio
-Gmail: sakurasatio@gmail.com
 
 NOTE:
 <IAM-ROLE-NAME-TASK-1> will be given in yellow color in TASK 1
