@@ -1,0 +1,78 @@
+Author: Sakura Satio
+Gmail: sakurasatio@gmail.com
+
+NOTE:
+<IAM-ROLE-NAME-TASK-1> will be given in yellow color in TASK 1
+<IAM-SERVICE-ACC-TASK-2> will be given in yellow color in TASK 2
+<CLUSTER-NAME-TASK-4> will be given in yellow color in TASK 4 [The cluster must be called "..."]
+
+⭐Task 1:
+
+gcloud config set compute/zone us-east1-b
+
+nano role-definition.yaml
+
+*insert whatever is given below and replace whatever is written in <...>*
+---------------------------------------
+title: "<IAM-ROLE-NAME-TASK-1>"
+
+description: "Permissions"
+
+stage: "ALPHA"
+
+description: "Permissions"
+stage: "ALPHA"
+includedPermissions:
+- storage.buckets.get
+- storage.objects.get
+- storage.objects.list
+- storage.objects.update
+- storage.objects.create
+-----------------------------------------
+To save a .yaml file press ctrl+x then press y then press enter
+
+gcloud iam service-accounts create orca-private-cluster-sa --display-name "Orca Private Cluster Service Account"
+
+gcloud iam roles create <IAM-ROLE-NAME-TASK-1> \
+   --project $DEVSHELL_PROJECT_ID \
+   --file role-definition.yaml
+   
+⭐TASK 2:
+
+gcloud iam service-accounts create <IAM-SERVICE-ACC-TASK-2> --display-name "Orca Private Cluster Service Account"
+
+gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
+   --member serviceAccount:<IAM-SERVICE-ACC-TASK-2>@$DEVSHELL_PROJECT_ID.iam.gserviceaccount.com --role roles/monitoring.viewer
+
+⭐TASK 3:
+
+gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
+   --member serviceAccount:<IAM-SERVICE-ACC-TASK-2>@$DEVSHELL_PROJECT_ID.iam.gserviceaccount.com --role roles/monitoring.metricWriter
+
+gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
+   --member serviceAccount:<IAM-SERVICE-ACC-TASK-2>@$DEVSHELL_PROJECT_ID.iam.gserviceaccount.com --role roles/logging.logWriter
+
+gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
+   --member serviceAccount:<IAM-SERVICE-ACC-TASK-2>@$DEVSHELL_PROJECT_ID.iam.gserviceaccount.com --role projects/$DEVSHELL_PROJECT_ID/roles/<IAM-ROLE-NAME-TASK-1>
+   
+⭐TASK 4:
+
+gcloud container clusters create <CLUSTER-NAME-TASK-4> --num-nodes 1 --master-ipv4-cidr=172.16.0.64/28 --network orca-build-vpc --subnetwork orca-build-subnet --enable-master-authorized-networks  --master-authorized-networks 192.168.10.2/32 --enable-ip-alias --enable-private-nodes --enable-private-endpoint --service-account <IAM-SERVICE-ACC-TASK-2>@$DEVSHELL_PROJECT_ID.iam.gserviceaccount.com --zone us-east1-b
+
+⭐Task 5:
+
+1. Navigate to the Compute Engine in the Cloud Console.
+
+2. Click on the SSH button for the orca-jumphost instance.
+
+In the SSH window, connect to the private cluster by running the following:
+Run the following commands in ssh of orca-jumphost:
+
+gcloud config set compute/zone us-east1-b
+
+gcloud container clusters get-credentials <CLUSTER-NAME-TASK-4> --internal-ip
+
+kubectl create deployment hello-server --image=gcr.io/google-samples/hello-app:1.0
+
+kubectl expose deployment hello-server --name orca-hello-service \
+   --type LoadBalancer --port 80 --target-port 8080
