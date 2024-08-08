@@ -1,0 +1,126 @@
+Task 1: Create a Firestore database
+This task is super easy. In the Google Cloud Console,
+1. Navigate to Firestore.
+2. Select Native mode for this project.
+3. Choose nam5 (United States) as the location of your database.
+4. Click CREATE DATABASE.
+5. This usually takes a few minutes to initialize the Cloud Firestore.
+
+-----------------------------------------------------------------------------------------------------------------
+
+Task 2: Populate the Database
+1. Open the Cloud Shell, run the following to clone the repo: 
+
+git clone https://github.com/rosera/pet-theory.git
+
+2. Follow the instructions to import CSV using the node sample code from lab06: 
+
+cd ~/pet-theory/lab06/firebase-import-csv/solution
+npm install
+node index.js netflix_titles_original.csv
+
+-----------------------------------------------------------------------------------------------------------------
+
+Task 3: Create a REST API
+
+cd ..
+cd ..
+cd firebase-rest-api/solution-01
+
+You will need to build and deploy the code in pet-theory/lab06/firebase-rest-api/solution-01 as a Cloud Run Service via Google Container Registry. Run the following in the Cloud Shell:
+Please change [YOUR_ZONE] to given zone in LAB
+
+npm install
+
+gcloud builds submit \
+  --tag gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api:0.1
+
+gcloud beta run deploy netflix-dataset-service \
+  --image gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api:0.1 \
+  --platform managed \
+  --region [YOUR_ZONE]\
+  --allow-unauthenticated
+
+
+//Please change your Zone 
+
+SERVICE_URL=$(gcloud beta run services describe netflix-dataset-service --platform managed --region [YOUR_ZONE] --format="value(status.url)")
+
+echo $SERVICE_URL
+
+curl -X GET $SERVICE_URL
+
+-----------------------------------------------------------------------------------------------------------------
+
+Task 4: Firestore API access
+
+//This time you have to repeat the previous task for revision 0.2 of the code. You can update the service by running the following:
+//Please change your zone 
+
+cd ../solution-02
+npm install
+
+gcloud builds submit \
+  --tag gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api:0.2
+
+gcloud beta run deploy netflix-dataset-service \
+  --image gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api:0.2 \
+  --platform managed \
+  --region [YOUR_ZONE]\
+  --allow-unauthenticated
+
+//Please change your zone
+
+SERVICE_URL=$(gcloud beta run services describe netflix-dataset-service --platform managed --region [YOUR_ZONE] --format="value(status.url)")
+
+echo $SERVICE_URL
+
+curl -X GET $SERVICE_URL/2019
+
+-----------------------------------------------------------------------------------------------------------------
+Task 5: Deploy the Staging Frontend
+Please change your zone
+
+cd ..
+cd ..
+cd firebase-frontend
+ 
+
+gcloud builds submit \
+  --tag gcr.io/$GOOGLE_CLOUD_PROJECT/frontend-staging:0.1
+
+gcloud beta run deploy frontend-staging-service \
+  --image gcr.io/$GOOGLE_CLOUD_PROJECT/frontend-staging:0.1 \
+  --platform managed \
+  --region [YOUR_ZONE]\
+  --allow-unauthenticated
+
+Task 6: Deploy the Production Frontend
+
+-----------------------------------------------------------------------------------------------------------------
+
+To deploy a production frontend, you need to configure the service endpoint in the public/app.js file by modifying the following:
+
+cd public
+nano app.js
+
+1. Comment out const REST_API_SERVICE = "data/netflix.json". in line 4.
+2. Uncomment // const REST_API_SERVICE = "https://XXXX-SERVICE.run.app/2020" in line 5.
+3. Replace https://XXXX-SERVICE.run.app with the SERVICE URL created in Task 4.
+5. Re-build and deploy the updated code as frontend-production by running the following:   
+
+
+cd ..
+npm install 
+gcloud builds submit \
+  --tag gcr.io/$GOOGLE_CLOUD_PROJECT/frontend-production:0.1
+   
+gcloud beta run deploy frontend-production-service \
+  --image gcr.io/$GOOGLE_CLOUD_PROJECT/frontend-production:0.1 \
+  --platform managed \
+  --region [YOUR_ZONE]\
+  --allow-unauthenticated
+
+
+  
+Congratulations! You completed this challenge lab.
